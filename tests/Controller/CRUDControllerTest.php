@@ -309,13 +309,12 @@ class CRUDControllerTest extends TestCase
 
         $this->controller = new CRUDController();
         $this->controller->setContainer($this->container);
+        $this->controller->configureAdmin($this->request);
 
         // Make some methods public to test them
         $testedMethods = [
             'renderJson',
             'isXmlHttpRequest',
-            // NEXT_MAJOR: Remove next line.
-            'configure',
             'getBaseTemplate',
             'redirectTo',
             'addFlash',
@@ -388,21 +387,6 @@ class CRUDControllerTest extends TestCase
         $this->assertTrue($this->protectedTestedMethods['isXmlHttpRequest']->invoke($this->controller, $this->request));
     }
 
-    /**
-     * NEXT_MAJOR: Remove this test.
-     *
-     * @group legacy
-     */
-    public function testConfigureCallsConfigureAdmin(): void
-    {
-        $this->admin->expects($this->once())
-            ->method('setRequest');
-
-        $this->expectDeprecation('The "Sonata\AdminBundle\Controller\CRUDController::configure()" method is deprecated since sonata-project/admin-bundle version 3.x and will be removed in 4.0 version.');
-
-        $this->protectedTestedMethods['configure']->invoke($this->controller);
-    }
-
     public function testConfigureAdmin(): void
     {
         $uniqueId = '';
@@ -448,7 +432,7 @@ class CRUDControllerTest extends TestCase
 
     public function testConfigureAdminWithException(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'There is no `_sonata_admin` defined for the controller `Sonata\AdminBundle\Controller\CRUDController`'
         );
@@ -588,6 +572,7 @@ class CRUDControllerTest extends TestCase
 
         $controller = new PreCRUDController();
         $controller->setContainer($this->container);
+        $controller->configureAdmin($this->request);
 
         $response = $controller->listAction($this->request);
         $this->assertInstanceOf(Response::class, $response);
@@ -760,6 +745,7 @@ class CRUDControllerTest extends TestCase
 
         $controller = new PreCRUDController();
         $controller->setContainer($this->container);
+        $controller->configureAdmin($this->request);
 
         $response = $controller->showAction($this->request);
         $this->assertInstanceOf(Response::class, $response);
@@ -915,6 +901,7 @@ class CRUDControllerTest extends TestCase
 
         $controller = new PreCRUDController();
         $controller->setContainer($this->container);
+        $controller->configureAdmin($this->request);
 
         $response = $controller->deleteAction($this->request);
         $this->assertInstanceOf(Response::class, $response);
@@ -1375,6 +1362,7 @@ class CRUDControllerTest extends TestCase
 
         $controller = new PreCRUDController();
         $controller->setContainer($this->container);
+        $controller->configureAdmin($this->request);
 
         $response = $controller->editAction($this->request);
         $this->assertInstanceOf(Response::class, $response);
@@ -1891,6 +1879,7 @@ class CRUDControllerTest extends TestCase
 
         $controller = new PreCRUDController();
         $controller->setContainer($this->container);
+        $controller->configureAdmin($this->request);
 
         $response = $controller->createAction($this->request);
         $this->assertInstanceOf(Response::class, $response);
@@ -3511,6 +3500,7 @@ class CRUDControllerTest extends TestCase
     {
         $controller = new BatchAdminController();
         $controller->setContainer($this->container);
+        $controller->configureAdmin($this->request);
 
         $batchActions = [$actionName => ['label' => 'Foo Bar', 'ask_confirmation' => false]];
 
@@ -3588,6 +3578,7 @@ class CRUDControllerTest extends TestCase
     {
         $controller = new BatchAdminController();
         $controller->setContainer($this->container);
+        $controller->configureAdmin($this->request);
 
         $batchActions = ['foo' => ['label' => 'Foo Bar', 'ask_confirmation' => false]];
 
@@ -3647,6 +3638,7 @@ class CRUDControllerTest extends TestCase
     {
         $controller = new BatchAdminController();
         $controller->setContainer($this->container);
+        $controller->configureAdmin($this->request);
 
         $batchActions = ['bar' => ['label' => 'Foo Bar', 'ask_confirmation' => false]];
 
