@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Sonata\AdminBundle\Controller;
 
 use Doctrine\Inflector\InflectorFactory;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Sonata\AdminBundle\Admin\AdminInterface;
@@ -71,18 +70,6 @@ class CRUDController extends AbstractController
      * @var TemplateRegistryInterface
      */
     private $templateRegistry;
-
-    /**
-     * NEXT_MAJOR: We should not use this method for configuration, create a listener to call configureAdmin method.
-     */
-    public function setContainer(ContainerInterface $container): ?ContainerInterface
-    {
-        $result = parent::setContainer($container);
-
-        $this->configure('sonata_deprecation_mute');
-
-        return $result;
-    }
 
     public static function getSubscribedServices(): array
     {
@@ -916,17 +903,15 @@ class CRUDController extends AbstractController
     /**
      * Contextualize the admin class depends on the current request.
      *
-     * NEXT_MAJOR: Change \RuntimeException by \InvalidArgumentException in the next line.
-     *
      * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     final public function configureAdmin(Request $request): void
     {
         $adminCode = $request->get('_sonata_admin');
 
         if (null === $adminCode) {
-            // NEXT_MAJOR: Change \RuntimeException by \InvalidArgumentException in the next line.
-            throw new \RuntimeException(sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'There is no `_sonata_admin` defined for the controller `%s` and the current route `%s`.',
                 static::class,
                 $request->get('_route')
@@ -1006,24 +991,6 @@ class CRUDController extends AbstractController
         $request = $this->getRequest();
 
         return $request->isXmlHttpRequest() || $request->get('_xml_http_request');
-    }
-
-    /**
-     * @deprecated since sonata-project/admin-bundle 3.86, will be removed in 4.0. Use configureAdmin method instead.
-     */
-    protected function configure(): void
-    {
-        if ('sonata_deprecation_mute' !== (\func_get_args()[0] ?? null)) {
-            @trigger_error(sprintf(
-                'The "%s()" method is deprecated since sonata-project/admin-bundle version 3.86 and will be'
-                .' removed in 4.0 version.',
-                __METHOD__
-            ), E_USER_DEPRECATED);
-        }
-
-        $request = $this->getRequest();
-
-        $this->configureAdmin($request);
     }
 
     /**
